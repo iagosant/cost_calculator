@@ -1,24 +1,30 @@
 
 
 class Activity
-  attr_accessor :activity_name, :time_investment, :direct_cost, :satisfaction_index
-  def initialize(activity_name, time_investment, direct_cost, satisfaction_index)
+  attr_accessor :activity_name, :time_investment, :direct_cost, :satisfaction_index, :activity_cost
+
+  def initialize(activity_name, time_investment, direct_cost, satisfaction_index, activity_cost)
+
     @activity_name = activity_name
     @time_investment = time_investment
     @direct_cost = direct_cost
     @satisfaction_index = satisfaction_index
+    @activity_cost = activity_cost
+
   end
+
 end
 
 class Calculator
 
   def initialize
-    @activity = []
+    @activity = {}
     gather_salary_info
 
   end
 
   def gather_salary_info
+
   puts "Do you get paid a(once a week) b(once every two weeks) c(once per month)?"
   @schedule = gets.chomp
   case @schedule
@@ -40,6 +46,7 @@ class Calculator
     salary_per_week = gets.chomp.to_i
     yearly_salary = (salary_per_week * 4.3 * 12).to_i
     puts "Your yearly salary is $#{yearly_salary}"
+
     hourly_valuation(yearly_salary)
 
   end
@@ -48,6 +55,7 @@ class Calculator
 
     @hourly_valuation = (yearly_salary.to_f / 2064)
     puts "Each hour of yours is valued at $#{@hourly_valuation}"
+
     add_activity
 
   end
@@ -83,44 +91,50 @@ class Calculator
 
   def satisfaction_from_activity
 
-    puts "If you engage in this activity will you feel a(very happy), b(neutral), c(not happy)?"
+    puts "If you engage in this activity will you feel a(very happy), b(happy), c(neutral) d(unhappy)?"
 
     satisfaction_from_activity_input = gets.chomp
-    @satisfaction_index = 0
+    @satisfaction_index = @hourly_valuation
 
     case satisfaction_from_activity_input
       when "a"
-        @satisfaction_index = 1
+        @satisfaction_index = @hourly_valuation
       when "b"
-        @satisfaction_index = 0
+        @satisfaction_index = (@hourly_valuation / 2).to_i
       when "c"
-        @satisfaction_index = -1
+        @satisfaction_index = 0
+      when "d"
+        @satisfaction_index = (@hourly_valuation * -1).to_i
       else
         satisfaction_from_activity
         puts @satisfaction_index
     end
+
+    calculate_cost
+
+  end
+
+  def calculate_cost
+
+    total_of_activity = (@time_investment * @direct_cost).to_i
+    @activity_cost = total_of_activity + @satisfaction_index
+
     create_activity
 
   end
 
   def create_activity
 
-    @new_activity = Activity.new(@activity_name,  @time_investment,  @direct_cost, @satisfaction_index)
+    @new_activity = Activity.new(@activity_name,  @time_investment,  @direct_cost, @satisfaction_index, @activity_cost)
 
-    @activity << @new_activity
+    @activity[@activity_name]=@activity_cost
 
     list_activities
 
   end
 
   def list_activities
-    @activity.each do |activity|
-      name_of_activity = activity.activity_name
-      total_of_activity = (activity.time_investment * activity.direct_cost).to_i
-      puts "This is the total #{total_of_activity}"
-      @activity_cost = total_of_activity + @satisfaction_index
-      puts "This is the activity cost #{@activity_cost}"
-    end
+
     puts "Would you like a(add another activity) or r(run a cost calculation)?"
     answer = gets.chomp
     case answer
@@ -131,29 +145,25 @@ class Calculator
       else
         list_activities
       end
+
     end
 
-def cost_calculation
-  @highest_cost = 0
-  @lowest_cost = 0
-  @activity.each do |activity|
-    name_of_activity = activity.activity_name
-    puts name_of_activity
-    activity_cost = (activity.time_investment * activity.direct_cost).to_i
-    @highest_cost = activity_cost
-    case activity_cost
-    when activity_cost < @highest_cost
-      @highest_cost = @lowest_cost
-    when activity_cost >= @highest_cost
-      @highest_cost = activity_cost
-    else
+  def cost_calculation
+
+    sorted = @activity.sort_by { |name, cost| cost }.reverse
+
+    current_highest = sorted.shift
+    current_lowest = sorted.reverse.shift
+
+    unless current_lowest.nil?
+    puts "cost of current lowest is #{current_lowest}"
     end
-    end
-    puts "The highest cost activity is #{@highest_cost}"
-    puts "The lowest cost activity is #{@lowest_cost}"
+    puts "cost of current highest is #{current_highest}"
+
   end
-
 
 end
 
 Calculator.new
+# movies = Activity.new(Movies, 2, 10, a)
+# cleaning = Activity.new(Cleaning, 3, 12, c)

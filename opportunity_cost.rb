@@ -98,13 +98,13 @@ class Calculator
 
     case satisfaction_from_activity_input
       when "a"
-        @satisfaction_index = @hourly_valuation
+        @satisfaction_index = (@hourly_valuation * -1).to_i
       when "b"
-        @satisfaction_index = (@hourly_valuation / 2).to_i
+        @satisfaction_index = (@hourly_valuation / 2 * -1).to_i
       when "c"
         @satisfaction_index = 0
       when "d"
-        @satisfaction_index = (@hourly_valuation * -1).to_i
+        @satisfaction_index = @hourly_valuation
       else
         satisfaction_from_activity
         puts @satisfaction_index
@@ -156,9 +156,9 @@ class Calculator
     current_lowest = sorted.reverse.shift
 
     unless current_lowest.nil?
-    puts "cost of current lowest is #{current_lowest}"
+    puts "it costs less to #{current_lowest}"
     end
-    puts "cost of current highest is #{current_highest}"
+    puts "it costs more to #{current_highest}"
 
   end
 
